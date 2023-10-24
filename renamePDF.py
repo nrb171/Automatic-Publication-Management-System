@@ -1,26 +1,12 @@
 # Nicholas Barron - June 2023
 # This program will extract metadata from a PDF file and rename the file 
-# in a format consistent with the .README.txt file in the /Papers/ directory.
-
-#you may need to create a new virtual environment for this to work properly.
-    # you can install the virtual env. by loading the requirements.txt file
-    # and then running the following command:
-    # pip install -r ./.renamePDF/requirements.txt
+# in a format consistent with the .README.txt.
 
 
 #%% IMPORT LIBRARIES ******************************************************** #
 import subprocess
 #import sys
 import os
-
-
-#%% INSTALL DEPENDENCIES *******************************************************
-#kbib
-#subprocess.check_call([sys.executable, "-m", "pip", "install", "kbib[pdf]"])
-#pybtex
-#subprocess.check_call([sys.executable, "-m", "pip", "install", "pybtex"])
-
-#%% LOAD NEW LIBRARIES *********************************************************
 import pybtex
 import pybtex.database
 
