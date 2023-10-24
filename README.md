@@ -40,6 +40,8 @@ It would have the following name: `Yu2020Didlake - Asymmetric Rainband Processes
 3. Update the biblio.bib file `./.bibliography/biblio.bib`
 	a. Use the "LastnameYYYY*# format for the reference ID.
 
+# See Also:
+[Automatic Publication Summarization](https://github.com/nrb171/Automatic-Publication-Summarization)
 
 # CHANGELOG 
 2023-06-07: Nicholas Barron
