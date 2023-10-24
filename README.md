@@ -45,6 +45,8 @@ It would have the following name: `Yu2020Didlake - Asymmetric Rainband Processes
 
 # CHANGELOG 
 2023-06-07: Nicholas Barron
-	- Initial repository creation
+- Initial repository creation
+ 
 2023-10-25: Nicholas Barron
-    - general updates
+- general updates
+- Format change to APMS name from renamePDF.
