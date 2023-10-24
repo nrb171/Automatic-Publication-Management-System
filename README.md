@@ -44,9 +44,11 @@ It would have the following name: `Yu2020Didlake - Asymmetric Rainband Processes
 [Automatic Publication Summarization](https://github.com/nrb171/Automatic-Publication-Summarization)
 
 # CHANGELOG 
+
 2023-06-07: Nicholas Barron
 - Initial repository creation
  
 2023-10-25: Nicholas Barron
 - general updates
 - Format change to APMS name from renamePDF.
+- Integrate with [APS](https://github.com/nrb171/Automatic-Publication-Summarization)
