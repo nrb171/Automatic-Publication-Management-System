@@ -9,8 +9,17 @@ import subprocess
 import os
 import pybtex
 import pybtex.database
+#import keyword args
+import argparse
 
-#%% RUN KBIB ON ALL PDF FILES IN ./Papers/ ************************************
+# parse arguments
+parser = argparse.ArgumentParser(description='Rename PDFs')
+
+parser.add_argument('-d', '--directory', type=str, default='.', help='Directory storing the PDFs to be renamed.')
+
+os.chdir(parser.parse_args().directory)
+
+
 #create output.log (overwrite if exists)
 output = open(".output.log", "w")
 #dayTime = subprocess.check_output(["date"]).decode()
