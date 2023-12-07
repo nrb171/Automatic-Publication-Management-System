@@ -10,43 +10,64 @@ import os
 import pybtex
 import pybtex.database
 from pybtex.database import BibliographyData, Entry
+import requests
+
 
 # import keyword args
 import argparse
 
 # %% functions
 
-# Dictionary to hold citation information
+# crossref API call
 
 
-def manualBib():
-    # Error handling for failed DOI or pdf search.
-    citation_info = {
-        "type": "article",
-        "fields": {}
-    }
+def find_doi(name, title, year):
+    """
+    Search for a DOI given an author's name, publication title, and year.
 
-    # Prompting user for necessary information
-    citation_info["fields"]["title"] = input(
-        "Enter the title of the article: ")
-    citation_info["fields"]["author"] = input(
-        "Enter the author(s) of the article: ")
-    citation_info["fields"]["journal"] = input("Enter the journal name: ")
-    citation_info["fields"]["year"] = input("Enter the publication year: ")
-    citation_info["fields"]["volume"] = input("Enter the volume number: ")
-    citation_info["fields"]["pages"] = input("Enter the page numbers: ")
-    citation_info["fields"]["doi"] = input(
-        "Enter the DOI (optional, press enter to skip): ")
+    Parameters:
+    name (str): Author's name.
+    title (str): Title of the publication.
+    year (str): Year of publication.
 
-    # Creating the BibTeX entry
-    entry = Entry(citation_info["type"], fields=citation_info["fields"])
-    bib_data = BibliographyData(entries={"myCitation": entry})
+    Returns:
+    str: DOI of the publication or a message if not found.
+    """
 
-    # Returning the formatted BibTeX entry
-    return bib_data.to_bytes("bibtex")
+    # Base URL for CrossRef API
+    base_url = "https://api.crossref.org/works?"
+
+    # Formulate the query
+    # Here we use the query.bibliographic parameter to search by publication title
+    query = "query.title=" + str(title.replace(" ", " ")) + \
+        "&query.author=" + str(name.replace(" ", "+")) + \
+        "&query.bibliographic="+str(year)
+    try:
+        # Send the request
+        response = requests.get(base_url+query)
+        response.raise_for_status()  # Raise an exception for HTTP errors
+
+        # Parse the response
+        data = response.json()
+        items = data.get("message", {}).get("items", [])
+
+        # Extract DOI if available
+        if items:
+            return items[0].get("DOI", "DOI not found.")
+        else:
+            return "No matching publication found."
+
+    except requests.RequestException as e:
+        return f"An error occurred: {e}"
 
 
 def processBib(bib):
+    """
+    Process the output of kbib to rename the PDF and add the BibTeX entry to biblio.bib.
+
+    Parameters:
+    bib (str): Output of kbib.
+    """
     # remove everything before "@"
 
     bibRaw = bib[bib.find(b'@'):]
@@ -102,8 +123,34 @@ def processBib(bib):
         output.write("Wrote bibtex entry for " + filename + "\n")
     else:
         print("File not renamed")
-        # add to output.log
-        output.write(filename+" not renamed\n")
+        raise Exception("File not renamed.\n")
+
+
+def manualBib():
+    """
+    Error handling for failed pdf search. Most often will happen with old, poorly formatted pdfs.
+    """
+    citation_info = {
+        "type": "article",
+        "fields": {}
+    }
+
+    # Prompting user for necessary information
+    citation_info["fields"]["title"] = input(
+        "Enter a few words of the article title: ")
+    citation_info["fields"]["author"] = input(
+        "Enter the author(s) of the article: ")
+    citation_info["fields"]["year"] = input("Enter the publication year: ")
+
+    # Creating the BibTeX entry
+    doi = find_doi(citation_info["fields"]["author"],
+                   citation_info["fields"]["title"],
+                   citation_info["fields"]["year"]
+                   )
+
+    # Returning the formatted BibTeX entry
+    return subprocess.check_output(
+        ["kbib", "-bib", doi])
 
 
 # %% MAIN PROGRAM ************************************************************ #
@@ -135,25 +182,26 @@ for filename in filenames:
         try:
             bib = subprocess.check_output(
                 ["kbib", "-pdf", "./.unprocessedPapers/"+filename])
-            print(bib)
             processBib(bib)
-        except:
-            if input("Error with " + filename + "Manually add DOI? (y/n)") == "y":
-                doi = input("DOI: ")
-                try:
-                    bib = subprocess.check_output(
-                        ["kbib", "-bib", doi])
-                    processBib(bib)
-                except:
-                    print("DOI Lookup failed for " + filename)
-                    # add to output.log
-                    output.write("DOI Lookup failed for " + filename + "\n")
+            print(bib)
 
-                    bib = manualBib()
-                    processBib(bib)
+        except:
+            while True:
+                if input("Error with " + filename + ".\nManually add bib? (y/n)") == "y":
+
+                    try:
+                        bib = manualBib()
+                        processBib(bib)
+                        break
+                    except:
+                        print("Error with " + filename+"\n")
+                        # add to output.log
+                        output.write("Error with " + filename + "\n")
+                else:
+                    break
 
             else:
-                print("Error with " + filename)
+                print("Error with " + filename+"\n")
                 # add to output.log
                 output.write("Error with " + filename + "\n")
                 continue
