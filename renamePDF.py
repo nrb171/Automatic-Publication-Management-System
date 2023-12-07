@@ -200,12 +200,6 @@ for filename in filenames:
                 else:
                     break
 
-            else:
-                print("Error with " + filename+"\n")
-                # add to output.log
-                output.write("Error with " + filename + "\n")
-                continue
-
 
 # close output.log and biblio.bib
 output.close()
